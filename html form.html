@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAN International Employee Equipment Form</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #00004B; /* Dark Navy Blue Background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.8); /* Wider, more visible shadow */
+    max-width: 500px;
+    width: 100%;
+}
+
+        .form-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #333;
+        }
+        .form-container input, .form-container select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .form-container label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #00004B; /* Dark Navy Blue Button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+        .form-container button:hover {
+            background-color: #00003B;
+        }
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h1>FAN International Employee Equipment Form</h1>
+        <form id="employeeForm">
+            <label for="employeeName">Employee Name:</label>
+            <input type="text" id="employeeName" placeholder="Employee Name" required>
+            
+            <label for="department">Department:</label>
+            <select id="department">
+                <option value="Development">Development</option>
+                <option value="Finance">Finance</option>
+                <option value="Operational">Operational</option>
+                <option value="CS">CS</option> <!-- Changed to CS -->
+                <option value="Sales">Sales</option>
+            </select>
+
+            <label for="laptop">Laptop: Personal/Work (if work, also complete the SN)</label>
+            <input type="text" id="laptop" placeholder="Laptop">
+            
+            <label for="mouse">Mouse: personal/from work</label>
+            <input type="text" id="mouse" placeholder="Mouse">
+            
+            <label for="headphones">Headphones: personal/from work</label>
+            <input type="text" id="headphones" placeholder="Headphones">
+            
+            <label for="phone">Phone: personal Dual SIM/Work (if work, also add phone IMEI)</label>
+            <input type="text" id="phone" placeholder="Phone">
+            
+            <label for="monitor">Monitor: yes/no, size, brand</label>
+            <input type="text" id="monitor" placeholder="Monitor">
+            
+            <label for="keyboard">Keyboard: yes (work or personal)/no</label>
+            <input type="text" id="keyboard" placeholder="Keyboard">
+            
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" id="phoneNumber" placeholder="Phone Number">
+            
+            <button type="submit">Submit</button>
+        </form>
+        <p class="success-message" id="successMessage">Employee added successfully!</p>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // Firebase configuration (use your project's Firebase credentials)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCH3j43cUp-EofMU8og7Tfy0ZoKfb_i700",
+            authDomain: "fan-international.firebaseapp.com",
+            projectId: "fan-international",
+            storageBucket: "fan-international.appspot.com",
+            messagingSenderId: "1092391632228",
+            appId: "1:1092391632228:web:f2c6e6fd3194b68f7bce71",
+            measurementId: "G-EBQY14XSSC"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Handle form submission
+        const employeeForm = document.getElementById('employeeForm');
+        employeeForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById('employeeName').value;
+            const department = document.getElementById('department').value;
+            const laptop = document.getElementById('laptop').value;
+            const mouse = document.getElementById('mouse').value;
+            const headphones = document.getElementById('headphones').value;
+            const phone = document.getElementById('phone').value;
+            const monitor = document.getElementById('monitor').value;
+            const keyboard = document.getElementById('keyboard').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+
+            // Create employee object to store in Firestore
+            const newEmployee = {
+                name,
+                department,
+                laptop: laptop || 'N/A',
+                mouse: mouse || 'N/A',
+                headphones: headphones || 'N/A',
+                phone: phone || 'N/A',
+                monitor: monitor || 'N/A',
+                keyboard: keyboard || 'N/A',
+                phoneNumber: phoneNumber || 'N/A'
+            };
+
+            try {
+                await addDoc(collection(db, "employees"), newEmployee);
+                document.getElementById('employeeForm').reset(); // Reset the form after submission
+                document.getElementById('successMessage').style.display = 'block'; // Show success message
+                setTimeout(() => {
+                    document.getElementById('successMessage').style.display = 'none';
+                }, 3000);
+            } catch (error) {
+                console.error("Error adding employee: ", error);
+            }
+        });
+    </script>
+
+</body>
+</html>
