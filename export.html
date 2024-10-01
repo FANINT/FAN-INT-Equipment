@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export Employee Data to Excel</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #00004B;
+            color: white;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #4B4BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #3B3BFF;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Export Employee Data</h1>
+    <button class="btn" id="exportBtn">Export to Excel</button>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import XLSX from "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCH3j43cUp-EofMU8og7Tfy0ZoKfb_i700",
+            authDomain: "fan-international.firebaseapp.com",
+            projectId: "fan-international",
+            storageBucket: "fan-international.appspot.com",
+            messagingSenderId: "1092391632228",
+            appId: "1:1092391632228:web:f2c6e6fd3194b68f7bce71",
+            measurementId: "G-EBQY14XSSC"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Fetch employee data from Firestore and prepare it for export
+        async function fetchEmployeeData() {
+            const querySnapshot = await getDocs(collection(db, "employees"));
+            const employeeData = [];
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                employeeData.push({
+                    Name: data.name,
+                    Department: data.department,
+                    Laptop: data.laptop || 'N/A',
+                    Mouse: data.mouse || 'N/A',
+                    Headphones: data.headphones || 'N/A',
+                    Phone: data.phone || 'N/A',
+                    Monitor: data.monitor || 'N/A',
+                    Keyboard: data.keyboard || 'N/A',
+                    PhoneNumber: data.phoneNumber || 'N/A'
+                });
+            });
+
+            return employeeData;
+        }
+
+        // Function to export data as Excel
+        async function exportToExcel() {
+            const employeeData = await fetchEmployeeData();
+
+            if (employeeData.length === 0) {
+                alert("No employee data to export.");
+                return;
+            }
+
+            const worksheet = XLSX.utils.json_to_sheet(employeeData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Employees");
+
+            // Export to Excel file
+            XLSX.writeFile(workbook, "employee_data.xlsx");
+        }
+
+        document.getElementById("exportBtn").addEventListener("click", exportToExcel);
+    </script>
+
+</body>
+</html>
